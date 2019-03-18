@@ -1,6 +1,9 @@
 #!/usr/local/bin/python
 from flask import Flask, jsonify, request, Response, json
-from settings import *
+from model import sports_model
+from model.settings import *
+from datetime import datetime
+
 
 events = {
     "id": 8661032861909884000,
@@ -37,24 +40,26 @@ events = {
 # GET Events
 @app.route('/events')
 def get_events():
-    return jsonify({'events': events})
+    return jsonify({'events': sports_model.Event.get_all_events()})
 
 # POST /event
 @app.route('/events', methods=['POST'])
 def add_event():
     request_data = request.get_json()
-    if(validEventData(request_data)):
-        SportsModel.add_event(request_data['event'])
 
-        response = Response("", 201, mimetype='application/json')
-        response.headers['Location'] = "/events/" + str(request_data['id'])
-        return response
-    else:
-        response = Response(json.dumps(request_data), status=400, mimetype="application/json")
-        return response
+    if(request_data['message_type'] == "NewEvent"):
+        if(validEventData(request_data)):
+            sports_model.Event.add_event(request_data['event']['id'], request_data['event']['name'], datetime.now(), request_data['event']['sport']['id'], request_data['event']['markets'][0]['id'])
+
+            response = Response("", 201, mimetype='application/json')
+            response.headers['Location'] = "/events/" + str(request_data['id'])
+            return response
+        else:
+            response = Response(json.dumps(request_data), status=400, mimetype="application/json")
+            return response
 
 
-# Event Data validity stub
+# TODO: Event Data validity stub
 def validEventData(eventObject):
     """
 
