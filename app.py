@@ -1,3 +1,4 @@
+#!/usr/local/bin/python
 from flask import Flask, jsonify, request, Response, json
 
 app = Flask(__name__)
@@ -38,6 +39,7 @@ events = {
 @app.route('/events')
 def get_events():
     return jsonify({'events': events})
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
