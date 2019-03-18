@@ -49,7 +49,16 @@ def add_event():
 
     if(request_data['message_type'] == "NewEvent"):
         if(validEventData(request_data)):
-            sports_model.Event.add_event(request_data['event']['id'], request_data['event']['name'], datetime.now(), request_data['event']['sport']['id'], request_data['event']['markets'][0]['id'])
+            sports_model.Event.add_event(request_data['event']['id'], request_data['event']['name'], datetime.now(), request_data['event']['sport']['id'])
+            sports_model.Market.add_market(request_data['event']['markets'][0]['id'], request_data['event']['markets'][0]['name'], request_data['event']['sport']['id'])
+
+            if ((request_data['event']['sport']['name'] == "Golf") and (len(request_data['event']['markets'][0]['selections']) > 2)):
+                sports_model.Selections.add_selection(request_data['event']['markets'][0]['selections'][0]['id'], request_data['event']['markets'][0]['selections'][0]['name'], request_data['event']['markets'][0]['selections'][0]['odds'], request_data['event']['id'] ,request_data['event']['markets'][0]['id'])
+                sports_model.Selections.add_selection(request_data['event']['markets'][0]['selections'][1]['id'], request_data['event']['markets'][0]['selections'][1]['name'], request_data['event']['markets'][0]['selections'][1]['odds'], request_data['event']['id'], request_data['event']['markets'][0]['id'])
+                sports_model.Selections.add_selection(request_data['event']['markets'][0]['selections'][2]['id'], request_data['event']['markets'][0]['selections'][2]['name'], request_data['event']['markets'][0]['selections'][2]['odds'], request_data['event']['id'], request_data['event']['markets'][0]['id'])
+            else:
+                sports_model.Selections.add_selection(request_data['event']['markets'][0]['selections'][0]['id'], request_data['event']['markets'][0]['selections'][0]['name'], request_data['event']['markets'][0]['selections'][0]['odds'], request_data['event']['id'] ,request_data['event']['markets'][0]['id'])
+                sports_model.Selections.add_selection(request_data['event']['markets'][0]['selections'][1]['id'], request_data['event']['markets'][0]['selections'][1]['name'], request_data['event']['markets'][0]['selections'][1]['odds'], request_data['event']['id'], request_data['event']['markets'][0]['id'])
 
             response = Response("", 201, mimetype='application/json')
             response.headers['Location'] = "/events/" + str(request_data['id'])

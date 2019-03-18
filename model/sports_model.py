@@ -14,15 +14,10 @@ class Event(db.Model):
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     sport_id = db.Column(db.Integer, db.ForeignKey('sport.id'))
-    sport = db.relationship("Sport", backref=db.backref("event", uselist=False))
+    sport = db.relationship("Sport", backref=db.backref("sport", uselist=False))
 
-    market_id = db.Column(db.Integer, db.ForeignKey('market.id'))
-    market = db.relationship("Market", backref=db.backref("event", uselist=False))
-
-
-
-    def add_event(_id, _name, _start_time, _sport_id, _market_id):
-        new_event = Event(id=_id, name=_name, start_time=_start_time, sport_id=_sport_id, market_id=_market_id)
+    def add_event(_id, _name, _start_time, _sport_id):
+        new_event = Event(id=_id, name=_name, start_time=_start_time, sport_id=_sport_id)
         db.session.add(new_event)
 
         try:
@@ -39,7 +34,6 @@ class Event(db.Model):
 
 
     def get_all_events():
-        #return Event.query.all()
         return [Event.json(event) for event in Event.query.all()]
 
     def __repr__(self):
@@ -47,8 +41,7 @@ class Event(db.Model):
             'id': self.id,
             'name': self.name,
             'start_time': self.start_time,
-            'sport_id': self.sport_id,
-            'market_id': self.market_id
+            'sport_id': self.sport_id
         }
 
         return json.dumps(event_object, default=str)
@@ -58,8 +51,7 @@ class Event(db.Model):
             'id': self.id,
             'name': self.name,
             'start_time': self.start_time,
-            'sport_id': self.sport_id,
-            'market_id': self.market_id
+            'sport_id': self.sport_id
         }
 
 
@@ -73,11 +65,11 @@ class Market(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(70))
 
-    selection_id = db.Column(db.Integer, db.ForeignKey('selection.id'))
-    selection = db.relationship("Selection", backref = db.backref("market"))
+    sport_id = db.Column(db.Integer, db.ForeignKey('sport.id'))
+    sport = db.relationship("Sport", backref=db.backref("sport", uselist=False))
 
-    def add_market(_id, _name):
-        market = Market(id=_id, name=_name)
+    def add_market(_id, _name, _sport_id):
+        market = Market(id=_id, name=_name, sport_id=_sport_id)
         db.session.add(market)
 
         try:
@@ -112,9 +104,14 @@ class Selection(db.Model):
     name = db.Column(db.String(90))
     odds = db.Column(db.Integer)
 
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    event = db.relationship("Event", backref=db.backref("event", uselist=False))
 
-    def add_selection(_id, _name, _odds):
-        selection = Market(id=_id, name=_name, odds=_odds)
+    market_id = db.Column(db.Integer, db.ForeignKey('market.id'))
+    market = db.relationship("Market", backref=db.backref("market", uselist=False))
+
+    def add_selection(_id, _name, _odds, _event_id, _market_id):
+        selection = Market(id=_id, name=_name, odds=_odds, event_id=_event_id, market_id=_market_id)
         db.session.add(selection)
 
         try:
