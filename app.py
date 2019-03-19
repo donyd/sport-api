@@ -92,7 +92,7 @@ def add_event():
                 sports_model.Selection.add_selection(request_data['event']['markets'][0]['selections'][1]['id'], request_data['event']['markets'][0]['selections'][1]['name'], request_data['event']['markets'][0]['selections'][1]['odds'], request_data['event']['id'], request_data['event']['markets'][0]['id'])
 
             response = Response("", 201, mimetype='application/json')
-            response.headers['Location'] = "/events/" + str(request_data['id'])
+            response.headers['Location'] = "api/events/" + str(request_data['event']['id'])
             return response
         else:
             response = Response(json.dumps(request_data), status=400, mimetype="application/json")
@@ -115,7 +115,7 @@ def update_event_odds(id):
             sports_model.Selection.update_odds(event_id, request_data['event']['markets'][0]['selections'][1]['id'], request_data['event']['markets'][0]['selections'][1]['odds'])
 
         response = Response("", 201, mimetype='application/json')
-        response.headers['Location'] = "/events/" + str(request_data['id'])
+        response.headers['Location'] = "api/events/" + str(request_data['event']['id'])
         return response
     else:
         response = Response(json.dumps(request_data), status=400, mimetype="application/json")
