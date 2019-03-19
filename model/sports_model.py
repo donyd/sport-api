@@ -167,10 +167,26 @@ class Selection(db.Model):
         return Selection.json(Selection.query.filter_by(id=_id).first())
 
     def get_selections_by_event_id(_event_id):
-        return Selection.json(Selection.query.filter_by(event_id=_event_id).first())
+        #return Selection.json(Selection.query.filter_by(event_id=_event_id))
+        return [Selection.json(selection) for selection in Selection.query.filter_by(event_id=_event_id)]
 
     def get_all_selections():
         return [Selection.json(selection) for selection in Selection.query.all()]
+
+    def update_odds(_event_id, _selection_id, _odds):
+        selection_to_update = Selection.json(Selection.query.filter_by(event_id=_event_id, id=_selection_id))
+        selection_to_update.odds = _odds
+
+        db.session.add(selection_to_update)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
+
 
     def __repr__(self):
         selection_object = {

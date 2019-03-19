@@ -46,7 +46,7 @@ def get_event_by_id(id):
     sport_id = event_returned.get('sport_id')
 
     market_returned = sports_model.Market.get_market_by_event_id(id)
-    selections_returned = sports_model.Selection.get_all_selections()
+    selections_returned = sports_model.Selection.get_selections_by_event_id(id)
     sport_returned = sports_model.Sport.get_sport_by_id(sport_id)
     response_url = "http://127.0.0.1:5000/api/events/" + str(event_id)
     event = {
@@ -70,37 +70,11 @@ def get_event_by_id(id):
             ]
         }
     }
-
-    # return jsonify({'event': {
-    #     'id': event_id,
-    #     'url': response_url,
-    #     'name': dict_event.get('name'),
-    #     'startTime': dict_event.get('start_time'),
-    #     'sport': {
-    #         'id': dict_event.get('sport_id'),
-    #         'name': 'Test'#dict_sport.get('name')
-    #     },
-    #     'markets': [
-    #         {
-    #             'id': dict_market['id'],
-    #             'name': dict_market.get('name'),
-    #             'selections': [
-    #                 {
-    #                     dict_selections
-    #                 }
-    #             ]
-    #         }
-    #     ]
-    #
-    # }})
     return jsonify(event)
-    #print(sports_model.Event.get_event_by_id(id))
-    #return jsonify({'event': sports_model.Event.get_event_by_id(id)})
-    #return jsonify({'events': sports_model.Event.get_all_events()})
 
 
-# POST /event
-@app.route('/api/events', methods=['POST'])
+# POST /api/event
+@app.route('/api/events', methods=['POST', 'PATCH'])
 def add_event():
     request_data = request.get_json()
 
@@ -123,6 +97,31 @@ def add_event():
         else:
             response = Response(json.dumps(request_data), status=400, mimetype="application/json")
             return response
+
+# PATCH /api/event
+@app.route('/api/events', methods=['PATCH'])
+def update_event_odds():
+    request_data = request.get_json()
+    event_returned = sports_model.Event.get_event_by_id(id)
+    event_id = event_returned.get('id')
+
+    if(request_data['message_type'] == "UpdateOdds"):
+        if ((request_data['event']['sport']['name'] == "Golf") and (len(request_data['event']['markets'][0]['selections']) > 2)):
+            sports_model.Selection.update_odds(event_id, request_data['event']['markets'][0]['selections'][0]['id'], request_data['event']['markets'][0]['selections'][0]['odds'])
+            sports_model.Selection.update_odds(event_id, request_data['event']['markets'][0]['selections'][1]['id'], request_data['event']['markets'][0]['selections'][1]['odds'])
+            sports_model.Selection.update_odds(event_id, request_data['event']['markets'][0]['selections'][2]['id'], request_data['event']['markets'][0]['selections'][2]['odds'])
+        else:
+            sports_model.Selection.update_odds(event_id, request_data['event']['markets'][0]['selections'][0]['id'], request_data['event']['markets'][0]['selections'][0]['odds'])
+            sports_model.Selection.update_odds(event_id, request_data['event']['markets'][0]['selections'][1]['id'], request_data['event']['markets'][0]['selections'][1]['odds'])
+
+        response = Response("", 201, mimetype='application/json')
+        response.headers['Location'] = "/events/" + str(request_data['id'])
+        return response
+    else:
+        response = Response(json.dumps(request_data), status=400, mimetype="application/json")
+        return response
+
+
 
 
 # TODO: Event Data validity stub
