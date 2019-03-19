@@ -30,6 +30,7 @@ class Event(db.Model):
 
     def get_event_by_id(_id):
         current_event = Event.query.filter_by(id=_id).first()
+        currrent_market = Market.query.filter_by()
         return current_event
 
 
@@ -55,6 +56,7 @@ class Event(db.Model):
         }
 
 
+
 class Sport(db.Model):
     __tablename__ = 'sport'
     id = db.Column(db.Integer, primary_key=True)
@@ -65,11 +67,14 @@ class Market(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(70))
 
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    event = db.relationship("Event", backref=db.backref("market_event", uselist=False))
+
     sport_id = db.Column(db.Integer, db.ForeignKey('sport.id'))
     sport = db.relationship("Sport", backref=db.backref("market_sport", uselist=False))
 
-    def add_market(_id, _name, _sport_id):
-        market = Market(id=_id, name=_name, sport_id=_sport_id)
+    def add_market(_id, _name, _event_id, _sport_id):
+        market = Market(id=_id, name=_name, event_id=_event_id, sport_id=_sport_id)
         db.session.add(market)
 
         try:
@@ -91,9 +96,7 @@ class Market(db.Model):
         market_object = {
             'id': self.id,
             'name': self.name,
-            'start_time': self.start_time,
-            'sport_id': self.sport_id,
-            'market_id': self.market_id
+            'sport_id': self.sport_id
         }
 
         return json.dumps(market_object, default=str)
@@ -130,15 +133,15 @@ class Selection(db.Model):
         return Selection.query.all()
 
     def __repr__(self):
-        market_object = {
+        selection_object = {
             'id': self.id,
             'name': self.name,
-            'start_time': self.start_time,
-            'sport_id': self.sport_id,
+            'odds': self.odds,
+            'event_id': self.event_id,
             'market_id': self.market_id
         }
 
-        return json.dumps(market_object, default=str)
+        return json.dumps(selection_object, default=str)
 
 
 

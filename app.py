@@ -50,7 +50,7 @@ def add_event():
     if(request_data['message_type'] == "NewEvent"):
         if(validEventData(request_data)):
             sports_model.Event.add_event(request_data['event']['id'], request_data['event']['name'], datetime.now(), request_data['event']['sport']['id'])
-            sports_model.Market.add_market(request_data['event']['markets'][0]['id'], request_data['event']['markets'][0]['name'], request_data['event']['sport']['id'])
+            sports_model.Market.add_market(request_data['event']['markets'][0]['id'], request_data['event']['markets'][0]['name'], request_data['event']['id'], request_data['event']['sport']['id'])
 
             if ((request_data['event']['sport']['name'] == "Golf") and (len(request_data['event']['markets'][0]['selections']) > 2)):
                 sports_model.Selection.add_selection(request_data['event']['markets'][0]['selections'][0]['id'], request_data['event']['markets'][0]['selections'][0]['name'], request_data['event']['markets'][0]['selections'][0]['odds'], request_data['event']['id'], request_data['event']['markets'][0]['id'])
@@ -81,3 +81,6 @@ def validEventData(eventObject):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
+
+def event_reformation():
+    pass
