@@ -74,7 +74,7 @@ def get_event_by_id(id):
 
 
 # POST /api/event
-@app.route('/api/events', methods=['POST', 'PATCH'])
+@app.route('/api/events', methods=['POST'])
 def add_event():
     request_data = request.get_json()
 
@@ -99,8 +99,8 @@ def add_event():
             return response
 
 # PATCH /api/event
-@app.route('/api/events', methods=['PATCH'])
-def update_event_odds():
+@app.route('/api/events/<int:id>', methods=['PATCH'])
+def update_event_odds(id):
     request_data = request.get_json()
     event_returned = sports_model.Event.get_event_by_id(id)
     event_id = event_returned.get('id')

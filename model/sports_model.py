@@ -174,7 +174,7 @@ class Selection(db.Model):
         return [Selection.json(selection) for selection in Selection.query.all()]
 
     def update_odds(_event_id, _selection_id, _odds):
-        selection_to_update = Selection.json(Selection.query.filter_by(event_id=_event_id, id=_selection_id))
+        selection_to_update = Selection.query.filter_by(event_id=_event_id, id=_selection_id).first()
         selection_to_update.odds = _odds
 
         db.session.add(selection_to_update)
