@@ -37,13 +37,70 @@ events = {
     }
 }
 
+
 # GET Events
-@app.route('/events')
-def get_events():
-    return jsonify({'events': sports_model.Event.get_all_events()})
+@app.route('/api/events/<int:id>')
+def get_event_by_id(id):
+    event_returned = sports_model.Event.get_event_by_id(id)
+    event_id = event_returned.get('id')
+    sport_id = event_returned.get('sport_id')
+
+    market_returned = sports_model.Market.get_market_by_event_id(id)
+    selections_returned = sports_model.Selection.get_all_selections()
+    sport_returned = sports_model.Sport.get_sport_by_id(sport_id)
+    response_url = "http://127.0.0.1:5000/api/events/" + str(event_id)
+    event = {
+        'event': {
+            'id': event_id,
+            'url': response_url,
+            'name': event_returned.get('name'),
+            'startTime': event_returned.get('start_time'),
+            'sport': {
+                'id': sport_id,
+                'name': sport_returned.get('name'),
+            },
+            'markets': [
+                {
+                    'id': market_returned.get('id'),
+                    'name': market_returned.get('name'),
+                    'selections': [
+                        selections_returned
+                    ]
+                }
+            ]
+        }
+    }
+
+    # return jsonify({'event': {
+    #     'id': event_id,
+    #     'url': response_url,
+    #     'name': dict_event.get('name'),
+    #     'startTime': dict_event.get('start_time'),
+    #     'sport': {
+    #         'id': dict_event.get('sport_id'),
+    #         'name': 'Test'#dict_sport.get('name')
+    #     },
+    #     'markets': [
+    #         {
+    #             'id': dict_market['id'],
+    #             'name': dict_market.get('name'),
+    #             'selections': [
+    #                 {
+    #                     dict_selections
+    #                 }
+    #             ]
+    #         }
+    #     ]
+    #
+    # }})
+    return jsonify(event)
+    #print(sports_model.Event.get_event_by_id(id))
+    #return jsonify({'event': sports_model.Event.get_event_by_id(id)})
+    #return jsonify({'events': sports_model.Event.get_all_events()})
+
 
 # POST /event
-@app.route('/events', methods=['POST'])
+@app.route('/api/events', methods=['POST'])
 def add_event():
     request_data = request.get_json()
 

@@ -29,9 +29,7 @@ class Event(db.Model):
             db.session.close()
 
     def get_event_by_id(_id):
-        current_event = Event.query.filter_by(id=_id).first()
-        currrent_market = Market.query.filter_by()
-        return current_event
+        return Event.json(Event.query.filter_by(id=_id).first())
 
 
     def get_all_events():
@@ -62,6 +60,36 @@ class Sport(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
 
+    def add_sport(_id, _name):
+        sport = Sport(id=_id, name=_name)
+        db.session.add(sport)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
+
+    def get_sport_by_id(_id):
+        return Sport.json(Sport.query.filter_by(id=_id).first())
+
+    def __repr__(self):
+        sport_object = {
+            'id': self.id,
+            'name': self.name
+        }
+
+        return json.dumps(sport_object, default=str)
+
+    def json(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
+
 class Market(db.Model):
     __tablename__ = 'market'
     id = db.Column(db.Integer, primary_key=True)
@@ -89,6 +117,9 @@ class Market(db.Model):
         current_market = Market.query.filter_by(id=_id).first()
         return current_market
 
+    def get_market_by_event_id(_event_id):
+        return Market.json(Market.query.filter_by(event_id=_event_id).first())
+
     def get_all_markets():
         return Market.query.all()
 
@@ -100,6 +131,13 @@ class Market(db.Model):
         }
 
         return json.dumps(market_object, default=str)
+
+    def json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'event_id': self.event_id
+        }
 
 class Selection(db.Model):
     __tablename__ = 'selection'
@@ -126,11 +164,13 @@ class Selection(db.Model):
             db.session.close()
 
     def get_selection_by_id(_id):
-        current_selection = Selection.query.filter_by(id=_id).first()
-        return current_selection
+        return Selection.json(Selection.query.filter_by(id=_id).first())
+
+    def get_selections_by_event_id(_event_id):
+        return Selection.json(Selection.query.filter_by(event_id=_event_id).first())
 
     def get_all_selections():
-        return Selection.query.all()
+        return [Selection.json(selection) for selection in Selection.query.all()]
 
     def __repr__(self):
         selection_object = {
@@ -142,6 +182,15 @@ class Selection(db.Model):
         }
 
         return json.dumps(selection_object, default=str)
+
+    def json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'odds': self.odds,
+            'event_id': self.event_id,
+            'market_id': self.market_id
+        }
 
 
 
