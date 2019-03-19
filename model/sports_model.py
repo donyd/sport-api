@@ -66,7 +66,7 @@ class Market(db.Model):
     name = db.Column(db.String(70))
 
     sport_id = db.Column(db.Integer, db.ForeignKey('sport.id'))
-    sport = db.relationship("Sport", backref=db.backref("sport", uselist=False))
+    sport = db.relationship("Sport", backref=db.backref("market_sport", uselist=False))
 
     def add_market(_id, _name, _sport_id):
         market = Market(id=_id, name=_name, sport_id=_sport_id)
