@@ -102,7 +102,7 @@ class Selection(db.Model):
     __tablename__ = 'selection'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(90))
-    odds = db.Column(db.Integer)
+    odds = db.Column(db.Float)
 
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship("Event", backref=db.backref("event", uselist=False))
@@ -111,7 +111,7 @@ class Selection(db.Model):
     market = db.relationship("Market", backref=db.backref("market", uselist=False))
 
     def add_selection(_id, _name, _odds, _event_id, _market_id):
-        selection = Market(id=_id, name=_name, odds=_odds, event_id=_event_id, market_id=_market_id)
+        selection = Selection(id=_id, name=_name, odds=_odds, event_id=_event_id, market_id=_market_id)
         db.session.add(selection)
 
         try:
